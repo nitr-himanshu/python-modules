@@ -1,17 +1,23 @@
 import numpy as np
 from PIL import Image 
 
-def makeTiles(img,size):
-    '''Take input img and return tiles(non-overlapping) of given size
-        img should be numpy array
-        size should be tuple
+def makeTiles(img_path,size,ratio=1):
     '''
+    Input : image path, size (tuple), ratio (0<r<=1)
+    size - size of each tiles
+    ratio - overlapping ratio.
+        1 = no overlapping
+        0 = same patch. 
+        warning : ratio = 0 results to an infinite loop
+    Output : List of numpy array of image tiles
+    '''
+    imobj = Image.open(img_path)
+    img = np.array(imobj)
     res = []
     th = size[0]
     tw = size[1]
     img_height = img.shape[0]
     img_width = img.shape[1]
-    imobj = Image.fromarray(img)
     
     left = 0
     top = 0
@@ -23,7 +29,7 @@ def makeTiles(img,size):
             im1 = imobj.crop((left,top,right,bottom))
             n = np.array(im1)
             res.append(n)
-            left = right
+            left = left + int(tw*ratio)
             right = left + tw
         left = 0
         right = left + tw
